@@ -21,6 +21,10 @@ class AuthController extends Controller {
 	use AuthenticatesAndRegistersUsers;
 
 	/**
+	* Where to redirect after signup
+	*/
+	protected $redirectTo = 'notices/create';
+	/**
 	 * Create a new authentication controller instance.
 	 *
 	 * @param  \Illuminate\Contracts\Auth\Guard  $auth
