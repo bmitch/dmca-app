@@ -31,6 +31,7 @@ class NoticesController extends Controller {
     public function create()
     {
         // get list of providers
+        
         // load a view to create a new notice
         return view('notices.create');
     }
