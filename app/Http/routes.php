@@ -5,7 +5,10 @@
 **/
 Route::get('/', 'PagesController@home');
 
-Route::get('home', 'HomeController@index');
+/**
+* Notices
+**/
+Route::resource('notices', 'NoticesController');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
