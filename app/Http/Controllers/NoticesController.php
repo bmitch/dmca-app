@@ -4,6 +4,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Guard;
 
 class NoticesController extends Controller {
 
@@ -37,11 +38,32 @@ class NoticesController extends Controller {
     }
 
     /**
-     * Confirm new notice
+     * Ask the user to confirm the DMCA that will be delivered
+     * 
+     * @param PrepareNoticeRequest $request
+     * @param Guard                $auth
+     * @return \Response
      */
-    public function confirm(Requests\PrepareNoticeRequest $request)
+    public function confirm(Requests\PrepareNoticeRequest $request, Guard $auth)
     {
-        return $request->all();
+        $template = $this->compileDmcaTemplate($data = $request->all(), $auth);
+        session()->flash('dmca', $data);
+        return view('notices.confirm', compact('template'));
+    }
+
+    public function store()
+    {
+        $data = session()->get('dmca');
+        return \Request::input('template');
+    }
+
+    public function compileDmcaTemplate($data, Guard $auth)
+    {
+        $data = $data + [
+            'name' => $auth->user()->name,
+            'email' => $auth->user()->email,
+        ];
+        return view()->file(app_path('Http/Templates/dmca.blade.php'), $data);
     }
 
 }
