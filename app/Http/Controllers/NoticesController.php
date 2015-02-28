@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
+use App\Notice;
+use Auth;
 
 class NoticesController extends Controller {
 
@@ -21,7 +23,7 @@ class NoticesController extends Controller {
      */
 	public function index()
     {
-        return 'all notices';
+        return Auth::user()->notices;
     }
 
     /**
@@ -51,10 +53,28 @@ class NoticesController extends Controller {
         return view('notices.confirm', compact('template'));
     }
 
-    public function store()
+    /**
+     *  Store a new DMCA notice.
+     *  @param Request $request
+     *  @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store(Request $request)
+    {
+        $this->createNotice($request);
+        return redirect('notices');
+    }
+
+    /**
+     *  Create and persist a new DMCA notice
+     *  @param Request $request
+     */
+    private function createNotice(Request $request)
     {
         $data = session()->get('dmca');
-        return \Request::input('template');
+        $notice = Notice::open($data)
+            ->useTemplate($request->input('template'));
+        
+        Auth::user()->notices()->save($notice);
     }
 
     public function compileDmcaTemplate($data, Guard $auth)
